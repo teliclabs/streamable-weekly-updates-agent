@@ -1,0 +1,10 @@
+.DS_Store
+.env
+.openclaw/
+repo/streamable/
+output/source/
+output/outbox/
+output/email-payloads/
+tmp/
+__pycache__/
+*.pyc

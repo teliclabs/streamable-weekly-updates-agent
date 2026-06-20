@@ -1,0 +1,98 @@
+{
+  "product": {
+    "name": "Streamable",
+    "site": "https://streamable.run",
+    "repoUrl": "https://github.com/teliclabs/streamable",
+    "branch": "main",
+    "localRepoDir": "repo/streamable"
+  },
+  "report": {
+    "lookbackDays": 7,
+    "timezone": "America/Los_Angeles",
+    "minBullets": 4,
+    "targetBullets": 6,
+    "recipient": "nathanang2000@gmail.com",
+    "from": "Nang <nang@streamable.run>",
+    "replyTo": "nang@streamable.run",
+    "subjectPrefix": "Streamable weekly Discord update draft"
+  },
+  "focus": {
+    "primary": "webapp",
+    "webappPathHints": [
+      "webapp/",
+      "webapp/app/",
+      "webapp/components/",
+      "webapp/public/",
+      "webapp/content/",
+      "webapp/emails/",
+      "webapp/i18n/",
+      "webapp/lib/",
+      "webapp/convex/",
+      "upload",
+      "uploads",
+      "clip",
+      "clips",
+      "recording",
+      "recordings"
+    ],
+    "diffPathspecs": [
+      "webapp"
+    ],
+    "serverUserFacingHints": [
+      "webapp/convex/",
+      "experimental-ingest-proxy/",
+      "api/",
+      "server/",
+      "backend/",
+      "workers/",
+      "services/",
+      "cloudflare-worker/",
+      "recording-service/",
+      "ingest-proxy",
+      "billing",
+      "auth",
+      "stream",
+      "streams",
+      "destination",
+      "destinations"
+    ],
+    "internalOnlyHints": [
+      ".github/",
+      "ci/",
+      "scripts/",
+      "infra/",
+      "terraform/",
+      "references/",
+      ".git-crypt/",
+      "image/plugins/",
+      "neko/",
+      "srtla/",
+      "migrations/",
+      "test/",
+      "tests/",
+      "spec/",
+      "specs/"
+    ],
+    "sensitiveTerms": [
+      "secret",
+      "token",
+      "key",
+      "credential",
+      "password",
+      "private",
+      "security",
+      "vulnerability",
+      "oauth",
+      "session",
+      "cookie",
+      ".env"
+    ]
+  },
+  "email": {
+    "provider": "resend-http",
+    "apiKeyEnv": "RESEND_API_KEY",
+    "envPath": ".env",
+    "fallbackEnvPath": "/Users/streamable/.openclaw/workspace-email-agent/email-agent/.env",
+    "apiUrl": "https://api.resend.com/emails"
+  }
+}
