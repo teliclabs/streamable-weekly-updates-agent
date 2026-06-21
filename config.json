@@ -18,6 +18,16 @@
     "replyTo": "nang@streamable.run",
     "subjectPrefix": "Streamable weekly Discord update draft"
   },
+  "publicUpdates": {
+    "url": "https://streamable.run/updates",
+    "productRepoDir": "repo/streamable",
+    "dataFile": "webapp/content/product-updates.ts",
+    "routeFile": "webapp/app/(main)/updates/page.tsx",
+    "stylesFile": "webapp/app/(main)/updates/updates.module.css",
+    "buildWorkingDir": "repo/streamable/webapp",
+    "buildCommand": "npm run build",
+    "commitMessagePrefix": "Update public updates log"
+  },
   "focus": {
     "primary": "webapp",
     "webappPathHints": [
