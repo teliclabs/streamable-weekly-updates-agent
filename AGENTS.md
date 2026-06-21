@@ -44,9 +44,9 @@ Product repo files:
 Weekly page update procedure:
 
 1. In `repo/streamable`, run `git fetch origin main` and `git pull --rebase origin main` before editing.
-2. Add the newest user-facing weekly highlights near the top of `productUpdateSections` in `webapp/content/product-updates.ts`.
-3. Keep the page public, titled `Updates`, and structured as one long email-style update log.
-4. Preserve the existing page style: a clean reading layout, month/week sections, tasteful emojis, and short human prose.
+2. Add a new user-facing weekly section near the top of `productUpdateSections` in `webapp/content/product-updates.ts`.
+3. Keep the page public, titled `Updates`, and structured as one long email-style weekly update log.
+4. Preserve the existing page style: a clean reading layout, weekly date-window sections, tasteful emojis, and short human prose.
 5. Do not add `/updates` to the header, sidebar, dashboard nav, or any authenticated product navigation. The footer link is enough.
 6. Run formatting if needed.
 7. Run `npm run build` from `repo/streamable/webapp`.
