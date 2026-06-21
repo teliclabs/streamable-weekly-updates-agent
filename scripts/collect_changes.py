@@ -165,6 +165,8 @@ def collect_commits(
                 "files": files,
                 "categories": categorize(files, subject, config),
                 "sensitive": is_sensitive(subject, files, config),
+                "staffOnly": is_staff_only(subject, files, config),
+                "audienceFacing": is_audience_facing(subject, files, config),
             }
         )
     return commits
@@ -195,6 +197,10 @@ def categorize(files: list[dict[str, str]], subject: str, config: dict[str, Any]
         categories.add("server-user-facing")
     if any(matches_hint(path, focus["internalOnlyHints"]) for path in paths):
         categories.add("internal")
+    if is_staff_only(subject, files, config):
+        categories.add("staff-only")
+    if is_audience_facing(subject, files, config):
+        categories.add("audience-facing")
     if any(path.endswith((".md", ".mdx", ".rst")) or "docs/" in path for path in paths):
         categories.add("docs")
     if any(term in subject_l for term in ["upload", "uploads", "clip", "clips", "recording", "recordings", "media"]):
@@ -220,6 +226,39 @@ def is_sensitive(subject: str, files: list[dict[str, str]], config: dict[str, An
     return any(term in haystack for term in terms)
 
 
+def is_staff_only(subject: str, files: list[dict[str, str]], config: dict[str, Any]) -> bool:
+    focus = config["focus"]
+    paths = [item["path"].lower() for item in files]
+    haystack = subject.lower() + " " + " ".join(paths)
+    if any(matches_hint(path, focus.get("staffOnlyPathHints", [])) for path in paths):
+        return True
+    return any(term.lower() in haystack for term in focus.get("staffOnlyTerms", []))
+
+
+def is_audience_facing(subject: str, files: list[dict[str, str]], config: dict[str, Any]) -> bool:
+    focus = config["focus"]
+    paths = [item["path"].lower() for item in files]
+    haystack = subject.lower() + " " + " ".join(paths)
+    hints = focus.get("audienceFacingPathHints", [])
+    return any(matches_hint(path, hints) for path in paths) or any(
+        term.lower() in haystack for term in hints if not term.endswith("/")
+    )
+
+
+def should_omit_commit(commit: dict[str, Any]) -> bool:
+    return bool(
+        commit.get("sensitive")
+        or commit.get("staffOnly")
+        or "internal" in commit.get("categories", [])
+        or not commit.get("audienceFacing")
+    )
+
+
+def audience_file(path: str, config: dict[str, Any]) -> bool:
+    fake_file = [{"path": path}]
+    return is_audience_facing("", fake_file, config) and not is_staff_only("", fake_file, config)
+
+
 def summarize(
     repo_dir: Path,
     ref: str,
@@ -230,22 +269,26 @@ def summarize(
     tz: ZoneInfo,
 ) -> dict[str, Any]:
     file_counter: Counter[str] = Counter()
+    audience_file_counter: Counter[str] = Counter()
     category_counter: Counter[str] = Counter()
     status_counter: Counter[str] = Counter()
     authors: Counter[str] = Counter()
-    public_candidates = 0
-    sensitive_count = 0
+    audience_candidates = 0
+    omitted_count = 0
 
     for commit in commits:
         authors[commit["author"]] += 1
-        if commit["sensitive"] or "internal" in commit["categories"]:
-            sensitive_count += 1
+        omitted = should_omit_commit(commit)
+        if omitted:
+            omitted_count += 1
         else:
-            public_candidates += 1
+            audience_candidates += 1
         for category in commit["categories"]:
             category_counter[category] += 1
         for item in commit["files"]:
             file_counter[item["path"]] += 1
+            if not omitted and audience_file(item["path"], config):
+                audience_file_counter[item["path"]] += 1
             status_counter[item["status"][0]] += 1
 
     base = run(
@@ -262,8 +305,14 @@ def summarize(
     full_diffstat = ""
     if base and end_rev:
         diff_args = ["git", "diff", "--stat", f"{base}..{end_rev}"]
-        pathspecs = config["focus"].get("diffPathspecs", ["webapp"])
-        diffstat = run(diff_args + ["--", *pathspecs], cwd=repo_dir, check=False).stdout.strip()
+        pathspecs = [
+            *config["focus"].get("diffPathspecs", ["webapp"]),
+            *config["focus"].get("diffExcludePathspecs", []),
+        ]
+        diffstat = filter_diffstat(
+            run(diff_args + ["--", *pathspecs], cwd=repo_dir, check=False).stdout.strip(),
+            config,
+        )
         full_diffstat = run(diff_args, cwd=repo_dir, check=False).stdout.strip()
 
     return {
@@ -283,12 +332,14 @@ def summarize(
         },
         "counts": {
             "commits": len(commits),
-            "publicCandidateCommits": public_candidates,
-            "sensitiveOrInternalCommits": sensitive_count,
+            "audienceCandidateCommits": audience_candidates,
+            "omittedNonAudienceCommits": omitted_count,
             "changedFiles": len(file_counter),
+            "audienceChangedFiles": len(audience_file_counter),
         },
         "categories": dict(category_counter.most_common()),
         "fileStatus": dict(status_counter.most_common()),
+        "topAudienceFiles": audience_file_counter.most_common(30),
         "topFiles": file_counter.most_common(30),
         "authors": authors.most_common(),
         "diffstat": diffstat,
@@ -296,9 +347,10 @@ def summarize(
         "commits": commits,
         "editorRules": [
             "Write for streamers, not developers.",
+            "The audience is streamers and technical operators, not Streamable admins or staff.",
             "Use 4-6 concise bullets on average.",
             "Mention Upload Corner only when upload/media changes are materially relevant.",
-            "Never mention secrets, keys, tokens, credential work, security internals, CI-only chores, migrations, or private infrastructure.",
+            "Never mention admin pages, staff tooling, internal dashboards, support/admin workflows, secrets, keys, tokens, credential work, security internals, CI-only chores, migrations, or private infrastructure.",
             "Do not invent changes. If evidence is unclear, omit it.",
         ],
     }
@@ -315,8 +367,9 @@ def render_markdown(summary: dict[str, Any]) -> str:
     lines.append(f"- Focus: `{product.get('site', 'streamable.run')}` web app and user-facing product behavior")
     lines.append(f"- Window: {window['sinceLocal']} to {window['untilLocal']} ({window['timezone']})")
     lines.append(f"- Commits collected: {counts['commits']}")
-    lines.append(f"- Public-candidate commits: {counts['publicCandidateCommits']}")
-    lines.append(f"- Sensitive/internal commits to avoid mentioning directly: {counts['sensitiveOrInternalCommits']}")
+    lines.append(f"- Audience-candidate commits: {counts['audienceCandidateCommits']}")
+    lines.append(f"- Omitted non-audience commits: {counts['omittedNonAudienceCommits']}")
+    lines.append(f"- Audience changed files: {counts['audienceChangedFiles']}")
     lines.append("")
     lines.append("## Category Counts")
     for category, count in summary["categories"].items():
@@ -330,18 +383,15 @@ def render_markdown(summary: dict[str, Any]) -> str:
         lines.append("")
         lines.append(f"Full repo diffstat line count: {summary['fullDiffstatLineCount']} (omitted here to keep webapp changes prominent).")
     lines.append("")
-    lines.append("## Top Changed Files")
-    for path, count in summary["topFiles"][:20]:
+    lines.append("## Top Audience Changed Files")
+    for path, count in summary["topAudienceFiles"][:20]:
         lines.append(f"- `{path}` ({count})")
     lines.append("")
-    lines.append("## Commit Inventory")
+    lines.append("## Audience Commit Inventory")
     for commit in summary["commits"]:
-        if commit["sensitive"]:
-            flag = "omit-sensitive"
-        elif "internal" in commit["categories"]:
-            flag = "omit-internal"
-        else:
-            flag = "public-candidate"
+        if should_omit_commit(commit):
+            continue
+        flag = "audience-candidate"
         categories = ", ".join(commit["categories"])
         lines.append(f"- `{commit['shortSha']}` {commit['date']} [{flag}; {categories}] {commit['subject']}")
         shown = 0
@@ -353,9 +403,46 @@ def render_markdown(summary: dict[str, Any]) -> str:
             lines.append(f"  - {item['status']}: `{item['path']}`")
             shown += 1
     lines.append("")
+    lines.append("## Omitted Commit Summary")
+    omitted_counts: Counter[str] = Counter()
+    for commit in summary["commits"]:
+        if not should_omit_commit(commit):
+            continue
+        if commit.get("sensitive"):
+            omitted_counts["sensitive"] += 1
+        elif commit.get("staffOnly"):
+            omitted_counts["staff-only/admin"] += 1
+        elif "internal" in commit.get("categories", []):
+            omitted_counts["internal"] += 1
+        elif not commit.get("audienceFacing"):
+            omitted_counts["not streamer/technical-user facing"] += 1
+    if omitted_counts:
+        for reason, count in omitted_counts.most_common():
+            lines.append(f"- {reason}: {count}")
+    else:
+        lines.append("- None")
+    lines.append("")
     lines.append("## Editor Rules")
     for rule in summary["editorRules"]:
         lines.append(f"- {rule}")
+    return "\n".join(lines)
+
+
+def filter_diffstat(diffstat: str, config: dict[str, Any]) -> str:
+    lines: list[str] = []
+    for line in diffstat.splitlines():
+        if "|" not in line:
+            continue
+        path_part = line.split("|", 1)[0].strip().lower()
+        fake_file = [{"path": path_part}]
+        focus = config["focus"]
+        if is_staff_only("", fake_file, config):
+            continue
+        if matches_hint(path_part, focus.get("internalOnlyHints", [])):
+            continue
+        if is_sensitive("", fake_file, config):
+            continue
+        lines.append(line)
     return "\n".join(lines)
 
 
