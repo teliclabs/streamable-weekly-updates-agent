@@ -6,8 +6,9 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
+import re
 import sys
-from collections import Counter, defaultdict
+from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -31,6 +32,7 @@ def main() -> int:
     parser.add_argument("--days", type=int, default=None, help="Lookback window in days.")
     parser.add_argument("--since", help="Explicit ISO/date git --since value.")
     parser.add_argument("--until", help="Explicit ISO/date git --until value.")
+    parser.add_argument("--label", help="Output filename label.")
     parser.add_argument("--no-fetch", action="store_true", help="Skip network fetch.")
     parser.add_argument("--print-json", action="store_true", help="Print the JSON report.")
     args = parser.parse_args()
@@ -48,9 +50,9 @@ def main() -> int:
     summary = summarize(repo_dir, ref, since, until, commits, config, tz)
 
     SOURCE_DIR.mkdir(parents=True, exist_ok=True)
-    stamp = datetime.now(tz).strftime("%Y-%m-%d")
-    json_path = SOURCE_DIR / f"{stamp}-streamable-source.json"
-    md_path = SOURCE_DIR / f"{stamp}-streamable-source.md"
+    label = args.label or default_label(since, until, tz)
+    json_path = SOURCE_DIR / f"{label}-streamable-source.json"
+    md_path = SOURCE_DIR / f"{label}-streamable-source.md"
     json_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n")
     md_path.write_text(render_markdown(summary) + "\n")
 
@@ -76,6 +78,13 @@ def parse_dt(value: str, tz: ZoneInfo) -> datetime:
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=tz)
     return parsed.astimezone(timezone.utc)
+
+
+def default_label(since: datetime, until: datetime, tz: ZoneInfo) -> str:
+    since_local = since.astimezone(tz).strftime("%Y-%m-%d")
+    until_local = until.astimezone(tz).strftime("%Y-%m-%d")
+    label = f"{since_local}_to_{until_local}"
+    return re.sub(r"[^0-9A-Za-z_.-]+", "-", label).strip("-")
 
 
 def run(cmd: list[str], cwd: Path | None = None, check: bool = True) -> GitResult:
@@ -244,10 +253,15 @@ def summarize(
         cwd=repo_dir,
         check=False,
     ).stdout.strip()
+    end_rev = run(
+        ["git", "rev-list", "-1", f"--before={until.isoformat()}", ref],
+        cwd=repo_dir,
+        check=False,
+    ).stdout.strip()
     diffstat = ""
     full_diffstat = ""
-    if base:
-        diff_args = ["git", "diff", "--stat", f"{base}..{ref}"]
+    if base and end_rev:
+        diff_args = ["git", "diff", "--stat", f"{base}..{end_rev}"]
         pathspecs = config["focus"].get("diffPathspecs", ["webapp"])
         diffstat = run(diff_args + ["--", *pathspecs], cwd=repo_dir, check=False).stdout.strip()
         full_diffstat = run(diff_args, cwd=repo_dir, check=False).stdout.strip()
@@ -265,6 +279,7 @@ def summarize(
             "path": str(repo_dir),
             "ref": ref,
             "head": run(["git", "rev-parse", ref], cwd=repo_dir).stdout.strip(),
+            "endRev": end_rev,
         },
         "counts": {
             "commits": len(commits),

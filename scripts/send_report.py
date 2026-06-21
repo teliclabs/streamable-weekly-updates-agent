@@ -93,13 +93,16 @@ def build_payload(config: dict[str, Any], markdown: str, subject: str | None) ->
     tz = ZoneInfo(report_config.get("timezone", "America/Los_Angeles"))
     today = datetime.now(tz).strftime("%Y-%m-%d")
     email_subject = subject or f"{report_config['subjectPrefix']} - {today}"
+    intro = "Here is this week's Discord-ready Streamable update draft."
+    if "backfill" in markdown.lower():
+        intro = "Here is the Streamable updates backfill draft."
     wrapped_text = (
-        "Here is this week's Discord-ready Streamable update draft.\n\n"
+        f"{intro}\n\n"
         "Review before posting or sending to the wider email list.\n\n"
         "-----\n\n"
         f"{markdown}\n"
     )
-    wrapped_html = render_html(markdown)
+    wrapped_html = render_html(markdown, intro)
     payload = {
         "from": report_config["from"],
         "to": [report_config["recipient"]],
@@ -111,10 +114,10 @@ def build_payload(config: dict[str, Any], markdown: str, subject: str | None) ->
     return {key: value for key, value in payload.items() if value}
 
 
-def render_html(markdown: str) -> str:
+def render_html(markdown: str, intro: str) -> str:
     parts = [
         "<html><body style=\"font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.45; color: #111827;\">",
-        "<p>Here is this week's Discord-ready Streamable update draft.</p>",
+        f"<p>{html.escape(intro)}</p>",
         "<p><strong>Review before posting or sending to the wider email list.</strong></p>",
         "<hr>",
     ]
@@ -177,6 +180,8 @@ def send_resend(api_url: str, api_key: str, payload: dict[str, Any]) -> Any:
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
+            "Accept": "application/json",
+            "User-Agent": "streamable-weekly-updates-agent/1.0",
         },
         method="POST",
     )
