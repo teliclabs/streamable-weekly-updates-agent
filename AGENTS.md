@@ -10,6 +10,12 @@ The audience is streamers and technical stream operators: people who use Streama
 
 This is not an update for Streamable admins, staff, support operators, growth operators, or people using internal dashboards.
 
+Editorial ethos:
+
+Before including any bullet, ask: "Would this be appropriate and good for a Streamable user to see?"
+
+If the answer is not clearly yes, omit it. If the change is real but the raw engineering wording is sensitive, negative, or too internal, translate only the user-safe benefit. For example, a GPU/server implementation change should become `Upgraded streaming servers` or `Smoother server performance`, not a hardware or migration detail.
+
 ## Weekly Run Procedure
 
 When asked to run `WEEKLY_STREAMABLE_UPDATE`:
@@ -51,8 +57,23 @@ Prioritize:
 - server-side changes only when they clearly affect streamer-facing or technical-user-facing behavior
 - bug fixes users would notice in their own workflow
 - workflow improvements for streamers, mods, editors, producers, or technical setup people
+- infrastructure or server changes only when they can be safely framed as a user benefit, such as upgraded servers, smoother performance, faster startup, better reliability, or cleaner stream recovery
 
 Mention `Upload Corner` when upload, recordings, clips, file handling, media processing, or library changes are materially relevant.
+
+## Positive Framing
+
+The Discord copy should sound like a product update, not a postmortem or engineering diff.
+
+Use user-safe translations:
+
+- GPU/server/instance/container details -> `Upgraded streaming servers` or `Smoother streaming server performance`
+- bug/fix/error/stuck/zombie/shutdown details -> `Improved reliability`, `Cleaner stream recovery`, or `More dependable server cleanup`
+- auth/API/credential/OAuth internals -> omit unless the user-visible result is obvious, then say `Sign-in/setup is smoother`
+- admin/support/payout/internal tooling -> omit
+- security, secrets, keys, tokens, private infrastructure, exact provider internals -> omit
+
+Do not include negative raw wording like "zombie", "stuck", "failed", "broken", "duplicate admin emails", or branch names. Keep the final update appropriate for a public Discord.
 
 ## What To Avoid
 
@@ -60,6 +81,8 @@ Never mention:
 
 - admin pages, admin dashboards, internal metrics, staff tooling, support tooling, impersonation, canary/admin controls, payouts/admin review pages, internal subscription-cancellation handling, manual paid/referral admin workflows, or any other Streamable-team-only feature
 - secrets, keys, tokens, credential rotation, auth internals, database migrations, private infrastructure, security hardening details, dependency-only chores, internal tests, refactors, CI-only changes, or staff-only tools
+- raw infrastructure details such as GPU instance migrations, EC2/ARN/container/Docker/PPA specifics, provider internals, branch names, or implementation paths
+- negative operational wording such as outage, stuck, zombie, failed, broken, duplicate, timeout, or shutdown, unless translated into a positive user benefit
 - raw commit hashes in the Discord copy
 - "we added a secret key" or anything equivalent
 - unsupported claims, roadmap promises, exact uptime guarantees, or unverified performance claims

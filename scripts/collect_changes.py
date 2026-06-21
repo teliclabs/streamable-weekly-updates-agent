@@ -167,6 +167,8 @@ def collect_commits(
                 "sensitive": is_sensitive(subject, files, config),
                 "staffOnly": is_staff_only(subject, files, config),
                 "audienceFacing": is_audience_facing(subject, files, config),
+                "positiveFramingRequired": needs_positive_framing(subject, files, config),
+                "mergeNoise": is_merge_noise(subject),
             }
         )
     return commits
@@ -201,6 +203,10 @@ def categorize(files: list[dict[str, str]], subject: str, config: dict[str, Any]
         categories.add("staff-only")
     if is_audience_facing(subject, files, config):
         categories.add("audience-facing")
+    if needs_positive_framing(subject, files, config):
+        categories.add("positive-framing-required")
+    if is_merge_noise(subject):
+        categories.add("merge-noise")
     if any(path.endswith((".md", ".mdx", ".rst")) or "docs/" in path for path in paths):
         categories.add("docs")
     if any(term in subject_l for term in ["upload", "uploads", "clip", "clips", "recording", "recordings", "media"]):
@@ -245,10 +251,22 @@ def is_audience_facing(subject: str, files: list[dict[str, str]], config: dict[s
     )
 
 
+def needs_positive_framing(subject: str, files: list[dict[str, str]], config: dict[str, Any]) -> bool:
+    terms = [term.lower() for term in config["focus"].get("positiveFramingTerms", [])]
+    haystack = subject.lower() + " " + " ".join(item["path"].lower() for item in files)
+    return any(term in haystack for term in terms)
+
+
+def is_merge_noise(subject: str) -> bool:
+    subject_l = subject.lower().strip()
+    return subject_l.startswith("merge pull request") or subject_l.startswith("merge branch")
+
+
 def should_omit_commit(commit: dict[str, Any]) -> bool:
     return bool(
         commit.get("sensitive")
         or commit.get("staffOnly")
+        or commit.get("mergeNoise")
         or "internal" in commit.get("categories", [])
         or not commit.get("audienceFacing")
     )
@@ -348,9 +366,11 @@ def summarize(
         "editorRules": [
             "Write for streamers, not developers.",
             "The audience is streamers and technical operators, not Streamable admins or staff.",
+            "Before including anything, ask: Would this be appropriate and good for a Streamable user to see?",
             "Use 4-6 concise bullets on average.",
+            "Translate raw infrastructure or negative wording into positive user benefits, for example GPU/server implementation work becomes upgraded servers or smoother server performance.",
             "Mention Upload Corner only when upload/media changes are materially relevant.",
-            "Never mention admin pages, staff tooling, internal dashboards, support/admin workflows, secrets, keys, tokens, credential work, security internals, CI-only chores, migrations, or private infrastructure.",
+            "Never mention admin pages, staff tooling, internal dashboards, support/admin workflows, secrets, keys, tokens, credential work, security internals, CI-only chores, migrations, private infrastructure, raw provider details, branch names, or negative operational wording.",
             "Do not invent changes. If evidence is unclear, omit it.",
         ],
     }
@@ -414,6 +434,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
             omitted_counts["staff-only/admin"] += 1
         elif "internal" in commit.get("categories", []):
             omitted_counts["internal"] += 1
+        elif commit.get("mergeNoise"):
+            omitted_counts["merge/branch noise"] += 1
         elif not commit.get("audienceFacing"):
             omitted_counts["not streamer/technical-user facing"] += 1
     if omitted_counts:
