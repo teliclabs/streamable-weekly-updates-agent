@@ -93,7 +93,7 @@ def build_payload(config: dict[str, Any], markdown: str, subject: str | None) ->
     tz = ZoneInfo(report_config.get("timezone", "America/Los_Angeles"))
     today = datetime.now(tz).strftime("%Y-%m-%d")
     email_subject = subject or f"{report_config['subjectPrefix']} - {today}"
-    intro = "Here is this week's Discord-ready Streamable update draft."
+    intro = "Here is this week's Discord-ready Streamable update draft in Markdown."
     if "backfill" in markdown.lower():
         intro = "Here is the Streamable updates backfill draft."
     wrapped_text = (
