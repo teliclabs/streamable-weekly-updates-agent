@@ -67,18 +67,28 @@ The report should be Discord-ready, not an engineering changelog.
 
 Target shape:
 
-- Short opener, 1-2 lines.
-- 4-6 bullets on average.
-- Use emojis when they help scanning, but keep the update clean.
+- Start with `@All Updates`, then a blank line, then `Streamable update this week! :blue_circle:`
+- Use standalone Discord-style update paragraphs, not Markdown bullet lists.
+- Use Discord emoji shortcodes like `:pencil2:`, `:clapper:`, `:control_knobs:`, `:mobile_phone:`, `:handshake:`, and `:books:` instead of Unicode emoji in the Discord draft.
+- 4-6 update paragraphs on average.
 - Prefer practical streamer or technical-operator benefits over implementation detail.
+- Write from the user's point of view. Prefer `you can`, `you no longer need to`, `it is easier to`, and `this helps you` framing over feature labels or implementation descriptions.
+- Explain the practical workflow benefit in the same bullet. Do not make Nathan infer why the change matters.
 - If there are many meaningful product updates, more bullets are allowed.
 - If the week is quiet, send a short honest note with the 1-3 real user-facing improvements.
 
 Good bullet style:
 
-- `🎬 Upload Corner: Uploads should feel smoother when ...`
-- `🛠️ Dashboard polish: The ... screen now ...`
-- `📡 Stream reliability: We tightened up ... so ...`
+- `@All Updates`
+- `Streamable update this week! :blue_circle:`
+- `:pencil2: Edit Stream titles in Streamable! You no longer need to bounce between Twitch/Kick and Streamable just to keep stream titles organized. Update titles from Streamable and keep each destination ready before going live.`
+- `:clapper: Upload Corner is live: You can give viewers a simple upload link, test it before stream, and approve submissions before anything shows up. Great for clip drops, viewer videos, and controlled chaos without losing control of the show.`
+- `:control_knobs: Multiple scene collections: You can prep different layouts for IRL, desktop, guest calls, sponsor segments, or special events, then switch the active setup from Streamable instead of rebuilding your scenes every time.`
+- `:mobile_phone: Cleaner Mobile Experience: It is easier to check stream duration, use the dashboard from your phone, and see whether stream actions went through while you are live.`
+
+Avoid bullets that only describe the product surface, like `Destination titles are easier to edit per destination`. Translate that into what a streamer can do now and why it saves time.
+
+If one update is especially easy for users to understand, lead with it. For example, a title-management update should become `Edit Stream titles in Streamable!` and lead the message when it is the clearest headline.
 
 ## What Counts
 
