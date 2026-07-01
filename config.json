@@ -25,6 +25,11 @@
     "audience": "streamers, creator operators, producers, technical stream teams, and people following Streamable as a product",
     "introLine": "Here are the new StreamableRun updates this week!",
     "mirrorDiscordDraft": true,
+    "includeFaq": true,
+    "faqDivider": "----",
+    "faqSectionTitle": "FAQ",
+    "attachImageToPost": false,
+    "sendImageAssetInEmail": false,
     "imageAsset": "assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg",
     "includeUpdatesLink": true,
     "updatesUrl": "https://streamable.run/updates",
@@ -36,7 +41,27 @@
     "companyAdminUrl": "https://www.linkedin.com/company/110907670/admin/",
     "companyName": "Streamable",
     "postAsCompanyOnly": true,
-    "abortIfPersonalComposer": true
+    "abortIfPersonalComposer": true,
+    "removeAutoLinkPreviewWhenTextOnly": true,
+    "knownGoodTextOnlyPostUrl": "https://www.linkedin.com/feed/update/urn:li:share:7477884120233033728?actorCompanyId=110907670",
+    "faq": [
+      {
+        "question": "What is StreamableRun?",
+        "answer": "StreamableRun is a cloud streaming server for creators and stream teams. It helps you run, manage, and organize your live stream workflow from the web."
+      },
+      {
+        "question": "Who is it for?",
+        "answer": "Streamers, IRL creators, producers, mods, editors, and technical stream teams who want a cleaner way to go live across Twitch, Kick, custom RTMP, OBS, LiveU, Moblin, and more."
+      },
+      {
+        "question": "What can I use it for?",
+        "answer": "You can manage stream titles, set up Upload Corner, prep scene collections, share ingests with collaborators, and keep more of your live production workflow in one place."
+      },
+      {
+        "question": "Where can I read the full update log?",
+        "answer": "https://streamable.run/updates"
+      }
+    ]
   },
   "publicUpdates": {
     "url": "https://streamable.run/updates",

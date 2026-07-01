@@ -14,14 +14,14 @@ It tracks:
 1. `scripts/collect_changes.py` fetches the Streamable repo and writes a source briefing from the last 7 days of commits.
 2. The OpenClaw agent reads the source briefing and drafts 4-6 user-facing Discord paragraphs.
 3. The agent writes the final Discord-ready copy to `output/outbox/YYYY-MM-DD-streamable-weekly.md`.
-4. The agent writes a LinkedIn-ready post to `output/outbox/YYYY-MM-DD-streamable-linkedin.md`.
+4. The agent writes a LinkedIn-ready post with the FAQ section to `output/outbox/YYYY-MM-DD-streamable-linkedin.md`.
 5. The agent updates `repo/streamable/webapp/content/product-updates.ts` so `https://streamable.run/updates` includes the new public weekly highlights.
 6. The agent runs `npm run build` from `repo/streamable/webapp`.
 7. If the build passes, the agent commits and pushes the Streamable product repo changes to `origin main`.
-8. After the product repo push succeeds, the agent posts the LinkedIn draft from the Streamable company admin page at `https://www.linkedin.com/company/110907670/admin/` using browser profile `streamable-linkedin-weekly`.
-9. After the LinkedIn posting attempt, `scripts/send_report.py --send --report <discord-file> --linkedin-report <linkedin-file> --linkedin-image assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg` emails both drafts, the LinkedIn image asset, and the posting result to Nathan.
+8. After the product repo push succeeds, the agent posts the text-only LinkedIn draft from the Streamable company admin page at `https://www.linkedin.com/company/110907670/admin/` using browser profile `streamable-linkedin-weekly`.
+9. After the LinkedIn posting attempt, `scripts/send_report.py --send --report <discord-file> --linkedin-report <linkedin-file>` emails both drafts and the posting result to Nathan.
 
-The script does not post to Discord, post to LinkedIn, or send to the email list. LinkedIn posting is done only by browser automation from the Streamable company admin page. The LinkedIn image asset is stored at `assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg`.
+The script does not post to Discord, post to LinkedIn, or send to the email list. LinkedIn posting is done only by browser automation from the Streamable company admin page. The current LinkedIn posting mode is text-only; do not attach the image asset unless Nathan explicitly asks for media again.
 
 The agent must not push `/updates` changes unless `npm run build` passes, and it must not email Nathan until the product repo push succeeds. The agent must never post from Nathan's personal LinkedIn profile.
 
@@ -47,8 +47,8 @@ Only commit and push the product repo after the build succeeds.
 After the product repo push succeeds, email Nathan the Markdown report:
 
 ```bash
-python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --linkedin-image assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg --dry-run
-python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --linkedin-image assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg --send
+python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --dry-run
+python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --send
 ```
 
 For LinkedIn posting, use browser profile `streamable-linkedin-weekly` and start from:
@@ -58,6 +58,17 @@ For LinkedIn posting, use browser profile `streamable-linkedin-weekly` and start
 Only publish if the composer is clearly posting as Streamable.
 
 The OpenClaw profile path is `/Users/streamable/.openclaw/browser/streamable-linkedin-weekly/user-data`, copied from the logged-in profile at `/Users/streamable/.openclaw/browser-profiles/streamable-linkedin-weekly`.
+
+Known-good LinkedIn path saved from the successful 2026-06-30 run:
+
+- Start from `https://www.linkedin.com/company/110907670/admin/`.
+- Use the Create button on that company admin page.
+- Paste the text-only LinkedIn draft with the FAQ section.
+- Remove any automatic link preview when running text-only.
+- Verify the composer is posting as Streamable.
+- Publish and capture the post URL.
+
+Successful reference post: `https://www.linkedin.com/feed/update/urn:li:share:7477884120233033728?actorCompanyId=110907670`
 
 ## GitHub Persistence
 
