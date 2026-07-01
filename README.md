@@ -7,7 +7,7 @@ It tracks:
 - Product repo: `https://github.com/teliclabs/streamable`
 - Primary focus: web app and user-facing server behavior
 - Recipient: `nathanang2000@gmail.com`
-- Output: a public `/updates` page entry, plus concise Markdown Discord-ready and LinkedIn-ready weekly drafts for Nathan
+- Output: a public `/updates` page entry, plus concise Markdown Discord-ready, LinkedIn-ready, and X-ready weekly drafts for Nathan
 
 ## Weekly Flow
 
@@ -15,22 +15,24 @@ It tracks:
 2. The OpenClaw agent reads the source briefing and drafts 4-6 user-facing Discord paragraphs.
 3. The agent writes the final Discord-ready copy to `output/outbox/YYYY-MM-DD-streamable-weekly.md`.
 4. The agent writes a LinkedIn-ready post with the FAQ section to `output/outbox/YYYY-MM-DD-streamable-linkedin.md`.
-5. The agent updates `repo/streamable/webapp/content/product-updates.ts` so `https://streamable.run/updates` includes the new public weekly highlights.
-6. The agent runs `npm run build` from `repo/streamable/webapp`.
-7. If the build passes, the agent commits and pushes the Streamable product repo changes to `origin main`.
-8. After the product repo push succeeds, `scripts/send_report.py --send --report <discord-file> --linkedin-report <linkedin-file>` emails both drafts and the LinkedIn approval command to Nathan.
-9. The weekly run stops there. LinkedIn is posted only after Nathan explicitly approves the draft.
+5. The agent writes an X-ready post without the FAQ section to `output/outbox/YYYY-MM-DD-streamable-x.md`.
+6. The agent updates `repo/streamable/webapp/content/product-updates.ts` so `https://streamable.run/updates` includes the new public weekly highlights.
+7. The agent runs `npm run build` from `repo/streamable/webapp`.
+8. If the build passes, the agent commits and pushes the Streamable product repo changes to `origin main`.
+9. After the product repo push succeeds, `scripts/send_report.py --send --report <discord-file> --linkedin-report <linkedin-file> --x-report <x-file>` emails all drafts and approval commands to Nathan.
+10. The weekly run stops there. LinkedIn and X are posted only after Nathan explicitly approves each draft.
 
-The script does not post to Discord, post to LinkedIn, or send to the email list. LinkedIn posting is done only by browser automation from the Streamable company admin page after explicit approval. The current LinkedIn posting mode is text-only; do not attach the image asset unless Nathan explicitly asks for media again.
+The script does not post to Discord, post to LinkedIn, post to X, or send to the email list. LinkedIn and X posting are done only by browser automation after explicit approval. The current social posting mode is text-only; do not attach image assets unless Nathan explicitly asks for media again.
 
 The agent must not push `/updates` changes unless `npm run build` passes, and it must not email Nathan until the product repo push succeeds. The agent must never post from Nathan's personal LinkedIn profile.
 
 ## LinkedIn Approval
 
-Weekly email approval command:
+Weekly email approval commands:
 
 ```text
 APPROVE LINKEDIN YYYY-MM-DD
+APPROVE X YYYY-MM-DD
 ```
 
 For now, Nathan should send that command in OpenClaw/Telegram after reviewing the email. Plain email replies are not automatic until Gmail Pub/Sub webhook approval is configured with `openclaw webhooks gmail setup` and `gog`/`gogcli`.
@@ -57,8 +59,8 @@ Only commit and push the product repo after the build succeeds.
 After the product repo push succeeds, email Nathan the Markdown report:
 
 ```bash
-python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --dry-run
-python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --send
+python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --x-report output/outbox/YYYY-MM-DD-streamable-x.md --dry-run
+python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --x-report output/outbox/YYYY-MM-DD-streamable-x.md --send
 ```
 
 After approval, use browser profile `streamable-linkedin-weekly` and start from:
@@ -79,6 +81,12 @@ Known-good LinkedIn path saved from the successful 2026-06-30 run:
 - Publish and capture the post URL.
 
 Successful reference post: `https://www.linkedin.com/feed/update/urn:li:share:7477884120233033728?actorCompanyId=110907670`
+
+For X posting, use browser profile `streamable-x-weekly` and start from:
+
+`https://x.com/home`
+
+Only publish if the browser is clearly logged into the intended StreamableRun account. The X draft should mirror LinkedIn but omit the FAQ section.
 
 ## GitHub Persistence
 

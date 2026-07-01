@@ -15,10 +15,11 @@
     "targetBullets": 6,
     "discordFileSuffix": "streamable-weekly.md",
     "linkedinFileSuffix": "streamable-linkedin.md",
+    "xFileSuffix": "streamable-x.md",
     "recipient": "nathanang2000@gmail.com",
     "from": "Nang <nang@streamable.run>",
     "replyTo": "nang@streamable.run",
-    "subjectPrefix": "Streamable weekly Discord + LinkedIn drafts"
+    "subjectPrefix": "Streamable weekly Discord + LinkedIn + X drafts"
   },
   "linkedin": {
     "enabled": true,
@@ -63,6 +64,29 @@
         "answer": "Go live from OBS, LiveU, Moblin, IRL Pro, or custom RTMP. Stream to Twitch, Kick, YouTube, Instagram, TikTok, and more. Manage titles, scenes, collaborators, overlays, clips, and viewer uploads in one place."
       }
     ]
+  },
+  "x": {
+    "enabled": true,
+    "audience": "streamers, creator operators, producers, technical stream teams, and people following Streamable as a product",
+    "introLine": "Here are the new StreamableRun updates this week! 🔵",
+    "mirrorLinkedInDraft": true,
+    "includeFaq": false,
+    "includeUpdatesLink": true,
+    "updatesUrl": "https://streamable.run/updates",
+    "autoPost": false,
+    "approvalRequired": true,
+    "approvalCommandTemplate": "APPROVE X {date}",
+    "approvalMode": "email_review_then_openclaw_or_telegram_command",
+    "emailReplyApprovalEnabled": false,
+    "postingMethod": "browser",
+    "browserProfile": "streamable-x-weekly",
+    "browserProfilePath": "/Users/streamable/.openclaw/browser/streamable-x-weekly/user-data",
+    "startUrl": "https://x.com/home",
+    "composeUrl": "https://x.com/compose/post",
+    "accountName": "StreamableRun",
+    "postAsAccountOnly": true,
+    "abortIfPersonalOrWrongAccount": true,
+    "currentPostingMode": "text-only"
   },
   "publicUpdates": {
     "url": "https://streamable.run/updates",

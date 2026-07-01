@@ -27,6 +27,7 @@ def main() -> int:
     parser.add_argument("--report", required=True, help="Markdown Discord report path.")
     parser.add_argument("--linkedin-report", help="Optional Markdown LinkedIn post draft path.")
     parser.add_argument("--linkedin-image", help="Optional image asset to attach for the LinkedIn post.")
+    parser.add_argument("--x-report", help="Optional Markdown X post draft path.")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--send", action="store_true", help="Send the email.")
     mode.add_argument("--dry-run", action="store_true", help="Write payload and do not send.")
@@ -58,8 +59,15 @@ def main() -> int:
             image_path = ROOT / image_path
         linkedin_image = build_attachment(image_path, "LinkedIn image")
 
+    x_markdown = None
+    if args.x_report:
+        x_path = Path(args.x_report)
+        if not x_path.is_absolute():
+            x_path = ROOT / x_path
+        x_markdown = read_markdown_report(x_path, "X report")
+
     load_env(config)
-    payload = build_payload(config, markdown, args.subject, linkedin_markdown, linkedin_image)
+    payload = build_payload(config, markdown, args.subject, linkedin_markdown, linkedin_image, x_markdown)
     save_payload(payload)
 
     if not args.send:
@@ -131,6 +139,7 @@ def build_payload(
     subject: str | None,
     linkedin_markdown: str | None = None,
     linkedin_image: dict[str, str] | None = None,
+    x_markdown: str | None = None,
 ) -> dict[str, Any]:
     report_config = config["report"]
     tz = ZoneInfo(report_config.get("timezone", "America/Los_Angeles"))
@@ -138,19 +147,29 @@ def build_payload(
     email_subject = subject or f"{report_config['subjectPrefix']} - {today}"
     intro = "Here is this week's Discord-ready Streamable update draft in Markdown."
     combined_markdown = markdown
-    approval_markdown = build_approval_markdown(config, today) if linkedin_markdown else None
-    if linkedin_markdown:
-        intro = "Here are this week's Discord and LinkedIn-ready Streamable update drafts."
+    approval_markdown = build_approval_markdown(config, today, bool(linkedin_markdown), bool(x_markdown))
+    if linkedin_markdown or x_markdown:
+        intro = "Here are this week's Discord, LinkedIn, and X-ready Streamable update drafts."
         combined_markdown = (
             "## Discord draft\n\n"
-            f"{markdown}\n\n"
-            "## LinkedIn post draft\n\n"
-            f"{linkedin_markdown}"
+            f"{markdown}"
         )
+        if linkedin_markdown:
+            combined_markdown = (
+                f"{combined_markdown}\n\n"
+                "## LinkedIn post draft\n\n"
+                f"{linkedin_markdown}"
+            )
+        if x_markdown:
+            combined_markdown = (
+                f"{combined_markdown}\n\n"
+                "## X post draft\n\n"
+                f"{x_markdown}"
+            )
         if approval_markdown:
             combined_markdown = (
                 f"{combined_markdown}\n\n"
-                "## LinkedIn approval\n\n"
+                "## Social approval\n\n"
                 f"{approval_markdown}"
             )
     if linkedin_image:
@@ -181,19 +200,31 @@ def build_payload(
     return {key: value for key, value in payload.items() if value}
 
 
-def build_approval_markdown(config: dict[str, Any], today: str) -> str | None:
+def build_approval_markdown(
+    config: dict[str, Any],
+    today: str,
+    include_linkedin: bool,
+    include_x: bool,
+) -> str | None:
+    commands: list[str] = []
     linkedin_config = config.get("linkedin", {})
-    if not linkedin_config.get("approvalRequired"):
+    if include_linkedin and linkedin_config.get("approvalRequired"):
+        command_template = linkedin_config.get("approvalCommandTemplate", "APPROVE LINKEDIN {date}")
+        commands.append(command_template.replace("{date}", today))
+    x_config = config.get("x", {})
+    if include_x and x_config.get("approvalRequired"):
+        command_template = x_config.get("approvalCommandTemplate", "APPROVE X {date}")
+        commands.append(command_template.replace("{date}", today))
+    if not commands:
         return None
-    command_template = linkedin_config.get("approvalCommandTemplate", "APPROVE LINKEDIN {date}")
-    command = command_template.replace("{date}", today)
-    if linkedin_config.get("emailReplyApprovalEnabled"):
+    rendered_commands = "\n".join(f"`{command}`" for command in commands)
+    if linkedin_config.get("emailReplyApprovalEnabled") or x_config.get("emailReplyApprovalEnabled"):
         return (
-            f"Reply with `{command}` to approve the LinkedIn post.\n\n"
-            "If you want edits, reply with the revised LinkedIn copy instead of approving."
+            f"Reply with the matching command to approve a social post:\n\n{rendered_commands}\n\n"
+            "If you want edits, reply with the revised copy instead of approving."
         )
     return (
-        f"To approve the LinkedIn post, send `{command}` in OpenClaw or Telegram after reviewing this email.\n\n"
+        f"To approve a social post, send the matching command in OpenClaw or Telegram after reviewing this email:\n\n{rendered_commands}\n\n"
         "Plain email replies are review notes only for now; automatic email-reply approval is not connected yet."
     )
 
