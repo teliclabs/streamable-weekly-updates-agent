@@ -18,9 +18,9 @@ It tracks:
 5. The agent updates `repo/streamable/webapp/content/product-updates.ts` so `https://streamable.run/updates` includes the new public weekly highlights.
 6. The agent runs `npm run build` from `repo/streamable/webapp`.
 7. If the build passes, the agent commits and pushes the Streamable product repo changes to `origin main`.
-8. After the product repo push succeeds, `scripts/send_report.py --send --report <discord-file> --linkedin-report <linkedin-file>` emails both drafts to Nathan.
+8. After the product repo push succeeds, `scripts/send_report.py --send --report <discord-file> --linkedin-report <linkedin-file> --linkedin-image assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg` emails both drafts and the LinkedIn image asset to Nathan.
 
-The script does not post to Discord, post to LinkedIn, or send to the email list. Nathan reviews and posts/sends manually.
+The script does not post to Discord, post to LinkedIn, or send to the email list. Nathan reviews and posts/sends manually. The LinkedIn image asset is stored at `assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg`.
 
 The agent must not push `/updates` changes unless `npm run build` passes, and it must not email Nathan until the product repo push succeeds.
 
@@ -46,8 +46,8 @@ Only commit and push the product repo after the build succeeds.
 After the product repo push succeeds, email Nathan the Markdown report:
 
 ```bash
-python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --dry-run
-python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --send
+python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --linkedin-image assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg --dry-run
+python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --linkedin-image assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg --send
 ```
 
 ## GitHub Persistence

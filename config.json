@@ -23,8 +23,9 @@
   "linkedin": {
     "enabled": true,
     "audience": "streamers, creator operators, producers, technical stream teams, and people following Streamable as a product",
-    "targetCharactersMin": 700,
-    "targetCharactersMax": 1200,
+    "introLine": "Here are the new StreamableRun updates this week!",
+    "mirrorDiscordDraft": true,
+    "imageAsset": "assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg",
     "includeUpdatesLink": true,
     "updatesUrl": "https://streamable.run/updates",
     "autoPost": false

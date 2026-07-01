@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import html
 import json
 import os
@@ -25,6 +26,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Email a Streamable weekly update markdown report.")
     parser.add_argument("--report", required=True, help="Markdown Discord report path.")
     parser.add_argument("--linkedin-report", help="Optional Markdown LinkedIn post draft path.")
+    parser.add_argument("--linkedin-image", help="Optional image asset to attach for the LinkedIn post.")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--send", action="store_true", help="Send the email.")
     mode.add_argument("--dry-run", action="store_true", help="Write payload and do not send.")
@@ -49,13 +51,20 @@ def main() -> int:
             linkedin_path = ROOT / linkedin_path
         linkedin_markdown = read_markdown_report(linkedin_path, "LinkedIn report")
 
+    linkedin_image = None
+    if args.linkedin_image:
+        image_path = Path(args.linkedin_image)
+        if not image_path.is_absolute():
+            image_path = ROOT / image_path
+        linkedin_image = build_attachment(image_path, "LinkedIn image")
+
     load_env(config)
-    payload = build_payload(config, markdown, args.subject, linkedin_markdown)
+    payload = build_payload(config, markdown, args.subject, linkedin_markdown, linkedin_image)
     save_payload(payload)
 
     if not args.send:
         print("Dry run only. Payload saved.")
-        print(json.dumps({k: v for k, v in payload.items() if k != "html"}, indent=2, ensure_ascii=False))
+        print(json.dumps({k: v for k, v in redact_payload(payload).items() if k != "html"}, indent=2, ensure_ascii=False))
         return 0
 
     api_key_env = config["email"].get("apiKeyEnv", "RESEND_API_KEY")
@@ -79,6 +88,17 @@ def read_markdown_report(path: Path, label: str) -> str:
     if not markdown:
         raise SystemExit(f"{label} file is empty: {path}")
     return markdown
+
+
+def build_attachment(path: Path, label: str) -> dict[str, str]:
+    if not path.exists():
+        raise SystemExit(f"Missing {label.lower()} file: {path}")
+    if not path.is_file():
+        raise SystemExit(f"{label} path is not a file: {path}")
+    return {
+        "filename": path.name,
+        "content": base64.b64encode(path.read_bytes()).decode("ascii"),
+    }
 
 
 def load_env(config: dict[str, Any]) -> None:
@@ -110,6 +130,7 @@ def build_payload(
     markdown: str,
     subject: str | None,
     linkedin_markdown: str | None = None,
+    linkedin_image: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     report_config = config["report"]
     tz = ZoneInfo(report_config.get("timezone", "America/Los_Angeles"))
@@ -124,6 +145,12 @@ def build_payload(
             f"{markdown}\n\n"
             "## LinkedIn post draft\n\n"
             f"{linkedin_markdown}"
+        )
+    if linkedin_image:
+        combined_markdown = (
+            f"{combined_markdown}\n\n"
+            "## LinkedIn image asset\n\n"
+            f"Attach `{linkedin_image['filename']}` to the LinkedIn post."
         )
     if "backfill" in markdown.lower():
         intro = "Here is the Streamable updates backfill draft."
@@ -142,6 +169,8 @@ def build_payload(
         "html": wrapped_html,
         "reply_to": report_config.get("replyTo"),
     }
+    if linkedin_image:
+        payload["attachments"] = [linkedin_image]
     return {key: value for key, value in payload.items() if value}
 
 
@@ -200,7 +229,16 @@ def save_payload(payload: dict[str, Any]) -> Path:
 
 
 def redact_payload(payload: dict[str, Any]) -> dict[str, Any]:
-    return dict(payload)
+    redacted = dict(payload)
+    if "attachments" in redacted:
+        redacted["attachments"] = [
+            {
+                "filename": attachment.get("filename"),
+                "content": f"<base64 redacted: {len(attachment.get('content', ''))} chars>",
+            }
+            for attachment in redacted["attachments"]
+        ]
+    return redacted
 
 
 def send_resend(api_url: str, api_key: str, payload: dict[str, Any]) -> Any:

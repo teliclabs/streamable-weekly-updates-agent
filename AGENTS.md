@@ -27,7 +27,7 @@ When asked to run `WEEKLY_STREAMABLE_UPDATE`:
 5. Update the public updates page in the cloned product repo at `repo/streamable`.
 6. Run `npm run build` from `repo/streamable/webapp`.
 7. If and only if the build passes, commit and push the Streamable product repo changes to `origin main`.
-8. After the product repo push succeeds, run `python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --send`.
+8. After the product repo push succeeds, run `python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --linkedin-image assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg --send`.
 9. Finish with both report paths, product build result, product commit hash, product push result, email result, and any blocker.
 
 Do not email Nathan until the webapp update has been committed and pushed successfully. If the build or push is blocked, report that blocker and leave the draft in `output/outbox/` for review.
@@ -93,25 +93,28 @@ If one update is especially easy for users to understand, lead with it. For exam
 
 ## LinkedIn Post Shape
 
-The LinkedIn post should be a separate draft adapted from the same weekly highlights, not a raw copy of the Discord message.
+The LinkedIn post should be a separate draft that mirrors the Discord draft closely. Use the same update ordering and body copy, but replace the Discord-specific intro.
 
 Write it for streamers, creator operators, producers, technical stream teams, and people following Streamable as a product. It should feel like a polished product update from the company: upbeat, practical, specific, and useful.
 
 Target shape:
 
-- 700-1,200 characters.
-- Start with a clean hook, such as `Streamable update this week:`
-- Use normal LinkedIn prose with short paragraphs or simple bullets.
-- Do not include `@All Updates`, Discord emoji shortcodes, or Discord-only formatting.
-- Lead with the clearest user benefit, then group smaller improvements naturally.
+- Start with: `Here are the new StreamableRun updates this week!`
+- Do not include `@All Updates`.
+- Keep the same update paragraphs as the Discord draft whenever possible.
+- Keep the same benefit-first voice and lead with the clearest user benefit.
+- Prefer platform-ready emoji over Discord shortcodes when writing a LinkedIn-ready post, unless Nathan explicitly asks for raw shortcode text.
 - Mention `https://streamable.run/updates` near the end as the place to read the full update log.
-- Use 0-3 relevant hashtags only if they feel natural, such as `#livestreaming`, `#streaming`, or `#OBS`.
+- Do not add a corporate essay, generic hashtags, or a long commentary thread unless Nathan asks.
+- Include the LinkedIn image asset `assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg` with the email so Nathan can attach it to the post.
 
 Good LinkedIn style:
 
-`Streamable update this week: we made it easier for streamers to run more of their workflow from one place.`
+`Here are the new StreamableRun updates this week!`
 
-`You can now edit stream titles from Streamable instead of bouncing between Twitch, Kick, and your dashboard. Upload Corner is live for viewer submissions, and scene collections make it easier to prep layouts for different shows, guests, or sponsor segments.`
+`✏️ Edit Stream titles in Streamable! You no longer need to bounce between Twitch/Kick and Streamable just to keep stream titles organized. Update titles from Streamable and keep each destination ready before going live.`
+
+`🎬 Upload Corner is live: You can give viewers a simple upload link, test it before stream, and approve submissions before anything shows up. Great for clip drops, viewer videos, and controlled chaos without losing control of the show.`
 
 `Full update log: https://streamable.run/updates`
 
