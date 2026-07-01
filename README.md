@@ -15,7 +15,7 @@ It tracks:
 2. The OpenClaw agent reads the source briefing and drafts 4-6 user-facing Discord paragraphs.
 3. The agent writes the final Discord-ready copy to `output/outbox/YYYY-MM-DD-streamable-weekly.md`.
 4. The agent writes a LinkedIn-ready post with the FAQ section to `output/outbox/YYYY-MM-DD-streamable-linkedin.md`.
-5. The agent writes an X-ready post without the FAQ section to `output/outbox/YYYY-MM-DD-streamable-x.md`.
+5. The agent writes an X-ready post without the FAQ section and without a `/updates` link to `output/outbox/YYYY-MM-DD-streamable-x.md`.
 6. The agent updates `repo/streamable/webapp/content/product-updates.ts` so `https://streamable.run/updates` includes the new public weekly highlights.
 7. The agent runs `npm run build` from `repo/streamable/webapp`.
 8. If the build passes, the agent commits and pushes the Streamable product repo changes to `origin main`.
@@ -86,7 +86,14 @@ For X posting, use browser profile `streamable-x-weekly` and start from:
 
 `https://x.com/home`
 
-Only publish if the browser is clearly logged into the intended StreamableRun account. The X draft should mirror LinkedIn but omit the FAQ section.
+Only publish if the browser is clearly logged into the intended StreamableRun account. The X draft should mirror LinkedIn but omit the FAQ section and the `/updates` link.
+
+Known-good X path saved from the successful 2026-06-30 run:
+
+- Use browser profile `streamable-x-weekly`.
+- Prefer `https://x.com/intent/post?text=<url-encoded-approved-draft>` so the full text renders visibly in the composer.
+- Verify the composer text is visible, logged in as `@streamablerun`, no FAQ is present, and no `/updates` link is present.
+- Click the enabled `Post` button once, then verify the new post on `https://x.com/streamablerun`.
 
 ## GitHub Persistence
 

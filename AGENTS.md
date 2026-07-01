@@ -165,7 +165,7 @@ Target shape:
 - Do not include `@All Updates`.
 - Keep the same update paragraphs and order as the LinkedIn draft whenever possible.
 - Keep platform-ready emoji, not Discord shortcodes.
-- Mention `https://streamable.run/updates` near the end as the place to read the full update log.
+- Do not include `https://streamable.run/updates` or any other link unless Nathan explicitly asks.
 - Do not include the LinkedIn `----` divider or `FAQ` section.
 - Do not add hashtags unless Nathan asks.
 - For now, publish X text-only. Do not attach images or other media unless Nathan explicitly re-enables media.
@@ -177,8 +177,6 @@ Good X style:
 `✏️ Edit Stream titles in Streamable! You no longer need to bounce between Twitch/Kick and Streamable just to keep stream titles organized. Update titles from Streamable and keep each destination ready before going live.`
 
 `🎬 Upload Corner is live: You can give viewers a simple upload link, test it before stream, and approve submissions before anything shows up. Great for clip drops, viewer videos, and controlled chaos without losing control of the show.`
-
-`Full update log: https://streamable.run/updates`
 
 If X rejects the full text because of account limits, stop and report the blocker instead of silently shortening or turning it into a thread.
 
