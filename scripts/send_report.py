@@ -138,6 +138,7 @@ def build_payload(
     email_subject = subject or f"{report_config['subjectPrefix']} - {today}"
     intro = "Here is this week's Discord-ready Streamable update draft in Markdown."
     combined_markdown = markdown
+    approval_markdown = build_approval_markdown(config, today) if linkedin_markdown else None
     if linkedin_markdown:
         intro = "Here are this week's Discord and LinkedIn-ready Streamable update drafts."
         combined_markdown = (
@@ -146,6 +147,12 @@ def build_payload(
             "## LinkedIn post draft\n\n"
             f"{linkedin_markdown}"
         )
+        if approval_markdown:
+            combined_markdown = (
+                f"{combined_markdown}\n\n"
+                "## LinkedIn approval\n\n"
+                f"{approval_markdown}"
+            )
     if linkedin_image:
         combined_markdown = (
             f"{combined_markdown}\n\n"
@@ -172,6 +179,23 @@ def build_payload(
     if linkedin_image:
         payload["attachments"] = [linkedin_image]
     return {key: value for key, value in payload.items() if value}
+
+
+def build_approval_markdown(config: dict[str, Any], today: str) -> str | None:
+    linkedin_config = config.get("linkedin", {})
+    if not linkedin_config.get("approvalRequired"):
+        return None
+    command_template = linkedin_config.get("approvalCommandTemplate", "APPROVE LINKEDIN {date}")
+    command = command_template.replace("{date}", today)
+    if linkedin_config.get("emailReplyApprovalEnabled"):
+        return (
+            f"Reply with `{command}` to approve the LinkedIn post.\n\n"
+            "If you want edits, reply with the revised LinkedIn copy instead of approving."
+        )
+    return (
+        f"To approve the LinkedIn post, send `{command}` in OpenClaw or Telegram after reviewing this email.\n\n"
+        "Plain email replies are review notes only for now; automatic email-reply approval is not connected yet."
+    )
 
 
 def render_html(markdown: str, intro: str) -> str:

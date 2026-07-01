@@ -7,7 +7,7 @@ It tracks:
 - Product repo: `https://github.com/teliclabs/streamable`
 - Primary focus: web app and user-facing server behavior
 - Recipient: `nathanang2000@gmail.com`
-- Output: a public `/updates` page entry, a LinkedIn company-page post, plus concise Markdown Discord-ready and LinkedIn-ready weekly drafts for Nathan
+- Output: a public `/updates` page entry, plus concise Markdown Discord-ready and LinkedIn-ready weekly drafts for Nathan
 
 ## Weekly Flow
 
@@ -18,12 +18,22 @@ It tracks:
 5. The agent updates `repo/streamable/webapp/content/product-updates.ts` so `https://streamable.run/updates` includes the new public weekly highlights.
 6. The agent runs `npm run build` from `repo/streamable/webapp`.
 7. If the build passes, the agent commits and pushes the Streamable product repo changes to `origin main`.
-8. After the product repo push succeeds, the agent posts the text-only LinkedIn draft from the Streamable company admin page at `https://www.linkedin.com/company/110907670/admin/` using browser profile `streamable-linkedin-weekly`.
-9. After the LinkedIn posting attempt, `scripts/send_report.py --send --report <discord-file> --linkedin-report <linkedin-file>` emails both drafts and the posting result to Nathan.
+8. After the product repo push succeeds, `scripts/send_report.py --send --report <discord-file> --linkedin-report <linkedin-file>` emails both drafts and the LinkedIn approval command to Nathan.
+9. The weekly run stops there. LinkedIn is posted only after Nathan explicitly approves the draft.
 
-The script does not post to Discord, post to LinkedIn, or send to the email list. LinkedIn posting is done only by browser automation from the Streamable company admin page. The current LinkedIn posting mode is text-only; do not attach the image asset unless Nathan explicitly asks for media again.
+The script does not post to Discord, post to LinkedIn, or send to the email list. LinkedIn posting is done only by browser automation from the Streamable company admin page after explicit approval. The current LinkedIn posting mode is text-only; do not attach the image asset unless Nathan explicitly asks for media again.
 
 The agent must not push `/updates` changes unless `npm run build` passes, and it must not email Nathan until the product repo push succeeds. The agent must never post from Nathan's personal LinkedIn profile.
+
+## LinkedIn Approval
+
+Weekly email approval command:
+
+```text
+APPROVE LINKEDIN YYYY-MM-DD
+```
+
+For now, Nathan should send that command in OpenClaw/Telegram after reviewing the email. Plain email replies are not automatic until Gmail Pub/Sub webhook approval is configured with `openclaw webhooks gmail setup` and `gog`/`gogcli`.
 
 ## Manual Run
 
@@ -51,7 +61,7 @@ python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-week
 python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --send
 ```
 
-For LinkedIn posting, use browser profile `streamable-linkedin-weekly` and start from:
+After approval, use browser profile `streamable-linkedin-weekly` and start from:
 
 `https://www.linkedin.com/company/110907670/admin/`
 
