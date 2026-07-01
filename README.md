@@ -7,19 +7,20 @@ It tracks:
 - Product repo: `https://github.com/teliclabs/streamable`
 - Primary focus: web app and user-facing server behavior
 - Recipient: `nathanang2000@gmail.com`
-- Output: a public `/updates` page entry, plus a concise Markdown Discord-ready weekly update draft for Nathan
+- Output: a public `/updates` page entry, plus concise Markdown Discord-ready and LinkedIn-ready weekly drafts for Nathan
 
 ## Weekly Flow
 
 1. `scripts/collect_changes.py` fetches the Streamable repo and writes a source briefing from the last 7 days of commits.
-2. The OpenClaw agent reads the source briefing and drafts 4-6 user-facing bullets.
+2. The OpenClaw agent reads the source briefing and drafts 4-6 user-facing Discord paragraphs.
 3. The agent writes the final Discord-ready copy to `output/outbox/YYYY-MM-DD-streamable-weekly.md`.
-4. The agent updates `repo/streamable/webapp/content/product-updates.ts` so `https://streamable.run/updates` includes the new public weekly highlights.
-5. The agent runs `npm run build` from `repo/streamable/webapp`.
-6. If the build passes, the agent commits and pushes the Streamable product repo changes to `origin main`.
-7. After the product repo push succeeds, `scripts/send_report.py --send --report <file>` emails the Markdown draft to Nathan.
+4. The agent writes a LinkedIn-ready post to `output/outbox/YYYY-MM-DD-streamable-linkedin.md`.
+5. The agent updates `repo/streamable/webapp/content/product-updates.ts` so `https://streamable.run/updates` includes the new public weekly highlights.
+6. The agent runs `npm run build` from `repo/streamable/webapp`.
+7. If the build passes, the agent commits and pushes the Streamable product repo changes to `origin main`.
+8. After the product repo push succeeds, `scripts/send_report.py --send --report <discord-file> --linkedin-report <linkedin-file>` emails both drafts to Nathan.
 
-The script does not post to Discord or send to the email list. Nathan reviews and posts/sends manually.
+The script does not post to Discord, post to LinkedIn, or send to the email list. Nathan reviews and posts/sends manually.
 
 The agent must not push `/updates` changes unless `npm run build` passes, and it must not email Nathan until the product repo push succeeds.
 
@@ -45,8 +46,8 @@ Only commit and push the product repo after the build succeeds.
 After the product repo push succeeds, email Nathan the Markdown report:
 
 ```bash
-python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --dry-run
-python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --send
+python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --dry-run
+python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --send
 ```
 
 ## GitHub Persistence

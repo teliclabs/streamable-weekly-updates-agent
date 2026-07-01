@@ -23,7 +23,8 @@ PAYLOAD_DIR = ROOT / "output" / "email-payloads"
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Email a Streamable weekly update markdown report.")
-    parser.add_argument("--report", required=True, help="Markdown report path.")
+    parser.add_argument("--report", required=True, help="Markdown Discord report path.")
+    parser.add_argument("--linkedin-report", help="Optional Markdown LinkedIn post draft path.")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--send", action="store_true", help="Send the email.")
     mode.add_argument("--dry-run", action="store_true", help="Write payload and do not send.")
@@ -37,12 +38,19 @@ def main() -> int:
     if not report_path.exists():
         raise SystemExit(f"Missing report file: {report_path}")
 
-    markdown = report_path.read_text().strip()
+    markdown = read_markdown_report(report_path, "Report")
     if not markdown:
         raise SystemExit(f"Report file is empty: {report_path}")
 
+    linkedin_markdown = None
+    if args.linkedin_report:
+        linkedin_path = Path(args.linkedin_report)
+        if not linkedin_path.is_absolute():
+            linkedin_path = ROOT / linkedin_path
+        linkedin_markdown = read_markdown_report(linkedin_path, "LinkedIn report")
+
     load_env(config)
-    payload = build_payload(config, markdown, args.subject)
+    payload = build_payload(config, markdown, args.subject, linkedin_markdown)
     save_payload(payload)
 
     if not args.send:
@@ -62,6 +70,15 @@ def main() -> int:
 
 def load_config() -> dict[str, Any]:
     return json.loads(CONFIG_PATH.read_text())
+
+
+def read_markdown_report(path: Path, label: str) -> str:
+    if not path.exists():
+        raise SystemExit(f"Missing {label.lower()} file: {path}")
+    markdown = path.read_text().strip()
+    if not markdown:
+        raise SystemExit(f"{label} file is empty: {path}")
+    return markdown
 
 
 def load_env(config: dict[str, Any]) -> None:
@@ -88,21 +105,35 @@ def apply_dotenv(path: Path) -> None:
             os.environ[key] = value
 
 
-def build_payload(config: dict[str, Any], markdown: str, subject: str | None) -> dict[str, Any]:
+def build_payload(
+    config: dict[str, Any],
+    markdown: str,
+    subject: str | None,
+    linkedin_markdown: str | None = None,
+) -> dict[str, Any]:
     report_config = config["report"]
     tz = ZoneInfo(report_config.get("timezone", "America/Los_Angeles"))
     today = datetime.now(tz).strftime("%Y-%m-%d")
     email_subject = subject or f"{report_config['subjectPrefix']} - {today}"
     intro = "Here is this week's Discord-ready Streamable update draft in Markdown."
+    combined_markdown = markdown
+    if linkedin_markdown:
+        intro = "Here are this week's Discord and LinkedIn-ready Streamable update drafts."
+        combined_markdown = (
+            "## Discord draft\n\n"
+            f"{markdown}\n\n"
+            "## LinkedIn post draft\n\n"
+            f"{linkedin_markdown}"
+        )
     if "backfill" in markdown.lower():
         intro = "Here is the Streamable updates backfill draft."
     wrapped_text = (
         f"{intro}\n\n"
         "Review before posting or sending to the wider email list.\n\n"
         "-----\n\n"
-        f"{markdown}\n"
+        f"{combined_markdown}\n"
     )
-    wrapped_html = render_html(markdown, intro)
+    wrapped_html = render_html(combined_markdown, intro)
     payload = {
         "from": report_config["from"],
         "to": [report_config["recipient"]],
