@@ -7,7 +7,7 @@ It tracks:
 - Product repo: `https://github.com/teliclabs/streamable`
 - Primary focus: web app and user-facing server behavior
 - Recipient: `nathanang2000@gmail.com`
-- Output: a public `/updates` page entry, plus concise Markdown Discord-ready and LinkedIn-ready weekly drafts for Nathan
+- Output: a public `/updates` page entry, a LinkedIn company-page post, plus concise Markdown Discord-ready and LinkedIn-ready weekly drafts for Nathan
 
 ## Weekly Flow
 
@@ -18,11 +18,12 @@ It tracks:
 5. The agent updates `repo/streamable/webapp/content/product-updates.ts` so `https://streamable.run/updates` includes the new public weekly highlights.
 6. The agent runs `npm run build` from `repo/streamable/webapp`.
 7. If the build passes, the agent commits and pushes the Streamable product repo changes to `origin main`.
-8. After the product repo push succeeds, `scripts/send_report.py --send --report <discord-file> --linkedin-report <linkedin-file> --linkedin-image assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg` emails both drafts and the LinkedIn image asset to Nathan.
+8. After the product repo push succeeds, the agent posts the LinkedIn draft from the Streamable company admin page at `https://www.linkedin.com/company/110907670/admin/` using browser profile `streamable-linkedin-weekly`.
+9. After the LinkedIn posting attempt, `scripts/send_report.py --send --report <discord-file> --linkedin-report <linkedin-file> --linkedin-image assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg` emails both drafts, the LinkedIn image asset, and the posting result to Nathan.
 
-The script does not post to Discord, post to LinkedIn, or send to the email list. Nathan reviews and posts/sends manually. The LinkedIn image asset is stored at `assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg`.
+The script does not post to Discord, post to LinkedIn, or send to the email list. LinkedIn posting is done only by browser automation from the Streamable company admin page. The LinkedIn image asset is stored at `assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg`.
 
-The agent must not push `/updates` changes unless `npm run build` passes, and it must not email Nathan until the product repo push succeeds.
+The agent must not push `/updates` changes unless `npm run build` passes, and it must not email Nathan until the product repo push succeeds. The agent must never post from Nathan's personal LinkedIn profile.
 
 ## Manual Run
 
@@ -49,6 +50,14 @@ After the product repo push succeeds, email Nathan the Markdown report:
 python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --linkedin-image assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg --dry-run
 python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --linkedin-image assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg --send
 ```
+
+For LinkedIn posting, use browser profile `streamable-linkedin-weekly` and start from:
+
+`https://www.linkedin.com/company/110907670/admin/`
+
+Only publish if the composer is clearly posting as Streamable.
+
+The OpenClaw profile path is `/Users/streamable/.openclaw/browser/streamable-linkedin-weekly/user-data`, copied from the logged-in profile at `/Users/streamable/.openclaw/browser-profiles/streamable-linkedin-weekly`.
 
 ## GitHub Persistence
 

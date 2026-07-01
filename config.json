@@ -28,7 +28,15 @@
     "imageAsset": "assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg",
     "includeUpdatesLink": true,
     "updatesUrl": "https://streamable.run/updates",
-    "autoPost": false
+    "autoPost": true,
+    "postingMethod": "browser",
+    "browserProfile": "streamable-linkedin-weekly",
+    "browserProfilePath": "/Users/streamable/.openclaw/browser/streamable-linkedin-weekly/user-data",
+    "loggedInProfileSourcePath": "/Users/streamable/.openclaw/browser-profiles/streamable-linkedin-weekly",
+    "companyAdminUrl": "https://www.linkedin.com/company/110907670/admin/",
+    "companyName": "Streamable",
+    "postAsCompanyOnly": true,
+    "abortIfPersonalComposer": true
   },
   "publicUpdates": {
     "url": "https://streamable.run/updates",
