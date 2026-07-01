@@ -28,6 +28,7 @@
     "includeFaq": true,
     "faqDivider": "----",
     "faqSectionTitle": "FAQ",
+    "faqQuestionPrefix": "🔵 ",
     "attachImageToPost": false,
     "sendImageAssetInEmail": false,
     "imageAsset": "assets/linkedin/streamable-linkedin-update-frame-1410143399.jpg",

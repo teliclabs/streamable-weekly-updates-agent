@@ -107,6 +107,7 @@ Target shape:
 - Prefer platform-ready emoji over Discord shortcodes when writing a LinkedIn-ready post, unless Nathan explicitly asks for raw shortcode text.
 - Mention `https://streamable.run/updates` near the end as the place to read the full update log.
 - End with a `----` divider and a short `FAQ` section.
+- Prefix each FAQ question line with the blue circle emoji, like `🔵 What is StreamableRun?`.
 - Do not add a corporate essay, generic hashtags, or a long commentary thread unless Nathan asks.
 - For now, publish LinkedIn text-only. Do not attach images or other media unless Nathan explicitly re-enables media.
 
@@ -124,13 +125,13 @@ Good LinkedIn style:
 
 `FAQ`
 
-`What is StreamableRun?`
+`🔵 What is StreamableRun?`
 `StreamableRun is a cloud streaming server built so live streamers can stream without issues. It helps keep streams smooth when the connection gets bad, with drop protection, Clips Player, multiple ingests, multistreaming, Remote OBS, Upload Corner, DDoS protection, and more.`
 
-`Who is it for?`
+`🔵 Who is it for?`
 `IRL streamers, producers, moderators, editors, and stream teams who want a cleaner way to go live.`
 
-`What can I use it for?`
+`🔵 What can I use it for?`
 `Go live from OBS, LiveU, Moblin, IRL Pro, or custom RTMP. Stream to Twitch, Kick, YouTube, Instagram, TikTok, and more. Manage titles, scenes, collaborators, overlays, clips, and viewer uploads in one place.`
 
 Keep the same safety filter as Discord and the public updates page. Omit admin/internal/sensitive/negative details. Do not overclaim, do not invent business metrics, and do not make roadmap promises.
