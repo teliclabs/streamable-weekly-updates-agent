@@ -47,19 +47,15 @@
     "faq": [
       {
         "question": "What is StreamableRun?",
-        "answer": "StreamableRun is a cloud streaming server for creators and stream teams. It helps you run, manage, and organize your live stream workflow from the web."
+        "answer": "StreamableRun is a cloud streaming server built so live streamers can stream without issues. It helps keep streams smooth when the connection gets bad, with drop protection, Clips Player, multiple ingests, multistreaming, Remote OBS, Upload Corner, DDoS protection, and more."
       },
       {
         "question": "Who is it for?",
-        "answer": "Streamers, IRL creators, producers, mods, editors, and technical stream teams who want a cleaner way to go live across Twitch, Kick, custom RTMP, OBS, LiveU, Moblin, and more."
+        "answer": "IRL streamers, producers, moderators, editors, and stream teams who want a cleaner way to go live."
       },
       {
         "question": "What can I use it for?",
-        "answer": "You can manage stream titles, set up Upload Corner, prep scene collections, share ingests with collaborators, and keep more of your live production workflow in one place."
-      },
-      {
-        "question": "Where can I read the full update log?",
-        "answer": "https://streamable.run/updates"
+        "answer": "Go live from OBS, LiveU, Moblin, IRL Pro, or custom RTMP. Stream to Twitch, Kick, YouTube, Instagram, TikTok, and more. Manage titles, scenes, collaborators, overlays, clips, and viewer uploads in one place."
       }
     ]
   },
