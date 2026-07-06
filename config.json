@@ -98,6 +98,35 @@
     "buildCommand": "npm run build",
     "commitMessagePrefix": "Update public updates log"
   },
+  "status": {
+    "directory": "output/status",
+    "filenamePattern": "{date}/{date}T{time}-weekly-status.md",
+    "timezone": "America/Los_Angeles",
+    "checkpointPhases": [
+      "started",
+      "changes_collected",
+      "drafts_written",
+      "build_started",
+      "build_passed",
+      "build_blocked",
+      "pushed",
+      "email_sent",
+      "blocked"
+    ],
+    "requiredFields": [
+      "phase",
+      "files_touched",
+      "build_result",
+      "commit_hash",
+      "push_result",
+      "email_recipient",
+      "email_result",
+      "resend_id",
+      "social_posting_status",
+      "blockers",
+      "next_action"
+    ]
+  },
   "focus": {
     "primary": "webapp",
     "webappPathHints": [

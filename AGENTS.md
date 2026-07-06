@@ -22,21 +22,72 @@ If the answer is not clearly yes, omit it. If the change is real but the raw eng
 
 When asked to run `WEEKLY_STREAMABLE_UPDATE`:
 
-1. Run `python3 scripts/collect_changes.py --days 7`.
-2. Open the newest file in `output/source/`.
-3. Draft the Discord update in `output/outbox/YYYY-MM-DD-streamable-weekly.md`.
-4. Draft the LinkedIn post in `output/outbox/YYYY-MM-DD-streamable-linkedin.md`.
-5. Draft the X post in `output/outbox/YYYY-MM-DD-streamable-x.md`.
-6. Update the public updates page in the cloned product repo at `repo/streamable`.
-7. Run `npm run build` from `repo/streamable/webapp`.
-8. If and only if the build passes, commit and push the Streamable product repo changes to `origin main`.
-9. After the product repo push succeeds, run `python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --x-report output/outbox/YYYY-MM-DD-streamable-x.md --send`.
-10. Do not post LinkedIn or X during the weekly run. Wait for Nathan's explicit approval.
-11. Finish with all report paths, product build result, product commit hash, product push result, email result, and any blocker.
+1. Start a run status artifact using the convention in `Manager Visibility Protocol`.
+2. Run `python3 scripts/collect_changes.py --days 7`.
+3. Open the newest file in `output/source/`.
+4. Draft the Discord update in `output/outbox/YYYY-MM-DD-streamable-weekly.md`.
+5. Draft the LinkedIn post in `output/outbox/YYYY-MM-DD-streamable-linkedin.md`.
+6. Draft the X post in `output/outbox/YYYY-MM-DD-streamable-x.md`.
+7. Update the public updates page in the cloned product repo at `repo/streamable`.
+8. Run `npm run build` from `repo/streamable/webapp`.
+9. If and only if the build passes, commit and push the Streamable product repo changes to `origin main`.
+10. After the product repo push succeeds, run `python3 scripts/send_report.py --report output/outbox/YYYY-MM-DD-streamable-weekly.md --linkedin-report output/outbox/YYYY-MM-DD-streamable-linkedin.md --x-report output/outbox/YYYY-MM-DD-streamable-x.md --send`.
+11. Do not post LinkedIn or X during the weekly run. Wait for Nathan's explicit approval.
+12. Finish with the status artifact path, all report paths, product build result, product commit hash, product push result, email result, and any blocker.
 
 Do not email Nathan until the webapp update has been committed and pushed successfully. If the build or push is blocked, report that blocker and leave the draft in `output/outbox/` for review.
 
 Use the local date in `America/Los_Angeles` for filenames and dates.
+
+## Manager Visibility Protocol
+
+During every weekly run, keep progress visible in two places: concise conversation checkpoints for the manager and a durable local status artifact under `output/status/`.
+
+Use this path convention for weekly run status files:
+
+`output/status/YYYY-MM-DD/YYYY-MM-DDTHHMMSS-weekly-status.md`
+
+Use `America/Los_Angeles` local date and 24-hour time for both the folder and filename timestamp. Create the file at run start, update it at each checkpoint, and mention its path in the final response. Treat these files as generated run artifacts, not product copy and not source-controlled instruction changes.
+
+Send a short manager checkpoint and update the status artifact at these moments:
+
+- run start
+- after collecting changes
+- after all Discord, LinkedIn, and X drafts are written
+- before starting the webapp build
+- after the webapp build finishes
+- after the product repo commit and push finish
+- after the Nathan email send finishes
+- immediately on any blocker, before stopping
+
+Each status artifact should stay lightweight but include these fields:
+
+```markdown
+# Weekly Update Status
+
+- Run date:
+- Started at:
+- Updated at:
+- Phase:
+- Status artifact:
+- Source briefing:
+- Draft files:
+- Product files touched:
+- Agent workspace files touched:
+- Build result:
+- Product commit hash:
+- Product push result:
+- Email recipient:
+- Email result:
+- Resend id:
+- Social posting status:
+- Blockers:
+- Next action:
+```
+
+Keep `Phase` to a small stable vocabulary such as `started`, `changes_collected`, `drafts_written`, `build_started`, `build_passed`, `build_blocked`, `pushed`, `email_sent`, or `blocked`. Use `Social posting status` to make clear that LinkedIn and X were not posted during the weekly run and are pending Nathan approval, unless the task is an explicit one-off social approval run.
+
+On a blocker, set `Phase` to `blocked`, record the command or step that blocked progress, preserve any draft paths already created, set `Next action` to the concrete owner/action needed, and do not continue into later gated steps.
 
 ## Social Approval
 
@@ -331,4 +382,5 @@ Do not commit:
 - cloned `repo/streamable`
 - generated source briefings
 - generated outbox reports
+- generated status artifacts
 - email payload logs
