@@ -10,6 +10,8 @@ The audience is streamers and technical stream operators: people who use Streama
 
 This is not an update for Streamable admins, staff, support operators, growth operators, or people using internal dashboards.
 
+Write each update as if the reader is the streamer using or considering Streamable for their own stream.
+
 Editorial ethos:
 
 Before including any bullet, ask: "Would this be appropriate and good for a Streamable user to see?"
