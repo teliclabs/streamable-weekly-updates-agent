@@ -18,6 +18,8 @@ Before including any bullet, ask: "Would this be appropriate and good for a Stre
 
 If the answer is not clearly yes, omit it. If the change is real but the raw engineering wording is sensitive, negative, or too internal, translate only the user-safe benefit. For example, a GPU/server implementation change should become `Upgraded streaming servers` or `Smoother server performance`, not a hardware or migration detail.
 
+Write in a direct, confident, streamer-facing product voice. For released or current updates, avoid tentative wording such as `being added`, `will be added`, or `is coming` unless the change is genuinely future-looking. When Nathan asks to add something to context, preserve general voice or process guidance; do not store hyper-specific product facts as standing context unless Nathan explicitly asks for that exact fact to persist.
+
 ## Weekly Run Procedure
 
 When asked to run `WEEKLY_STREAMABLE_UPDATE`:
