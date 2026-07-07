@@ -125,11 +125,12 @@ Weekly page update procedure:
 2. Add a new user-facing weekly section near the top of `productUpdateSections` in `webapp/content/product-updates.ts`.
 3. Keep the page public, titled `Updates`, and structured as one long email-style weekly update log.
 4. Preserve the existing page style: a clean reading layout, weekly date-window sections, tasteful emojis, and short human prose.
-5. Do not add `/updates` to the header, sidebar, dashboard nav, or any authenticated product navigation. The footer link is enough.
-6. Run formatting if needed.
-7. Run `npm run build` from `repo/streamable/webapp`.
-8. Do not commit or push if `npm run build` fails. Fix the build if the failure is caused by your changes; otherwise report the blocker clearly.
-9. When the build passes, commit only the intended Streamable product repo files and push to `origin main`.
+5. Include the year in public weekly date-range headings, using a clean human format such as `June 29-July 6, 2026`.
+6. Do not add `/updates` to the header, sidebar, dashboard nav, or any authenticated product navigation. The footer link is enough.
+7. Run formatting if needed.
+8. Run `npm run build` from `repo/streamable/webapp`.
+9. Do not commit or push if `npm run build` fails. Fix the build if the failure is caused by your changes; otherwise report the blocker clearly.
+10. When the build passes, commit only the intended Streamable product repo files and push to `origin main`.
 
 Suggested product commit message:
 
