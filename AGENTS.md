@@ -167,6 +167,14 @@ Avoid bullets that only describe the product surface, like `Destination titles a
 
 If one update is especially easy for users to understand, lead with it. For example, a title-management update should become `Edit Stream titles in Streamable!` and lead the message when it is the clearest headline.
 
+Nathan edit pattern example, for style only:
+
+- Treat this as an example of preferred wording, not permanent product facts to repeat without fresh source support.
+- A good edit can make labels more concrete, like `Stream Drop Protection is easier to tune for custom setups` instead of a flatter settings label.
+- Prefer concise guide grouping when the benefit is setup help, like `New setup guides are live` and `Many more video setup walkthroughs are ready`.
+- If Nathan explicitly asks for a future-looking teaser, keep it broad, streamer-facing, and clearly framed as in development, for example: `:rocket: New, exciting features for streamers are currently in development to help streamers engage their community and earn more money! Stay tuned. :)`
+- Do not invent roadmap promises yourself. Use this kind of teaser only when Nathan explicitly requests it for the current update.
+
 ## LinkedIn Post Shape
 
 The LinkedIn post should be a separate draft that mirrors the Discord draft closely. Use the same update ordering and body copy, but replace the Discord-specific intro.
